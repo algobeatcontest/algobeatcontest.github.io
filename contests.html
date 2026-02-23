@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algo Beat Contest 比赛列表</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+        }
+
+        /* 页面背景渐变 + 全局平滑过渡 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* ========== 顶部导航栏样式 ========== */
+        .top-nav {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 60px;
+        }
+
+        .site-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 30px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #3498db;
+        }
+
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        /* ========== 导航栏样式结束 ========== */
+
+        /* 页面容器 */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #2c3e50;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 比赛状态分组容器 */
+        .contest-status-group {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin: 0 auto 30px auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contest-status-group:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 比赛状态标题 */
+        .status-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e8f4fd;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-title::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+        }
+
+        /* 标题图标 - 新增进行中、调整原有 */
+        .status-title.ongoing::before {
+            content: "🟢";
+            font-size: 1.5rem;
+        }
+        .status-title.not-started::before {
+            content: "⏳";
+            font-size: 1.5rem;
+        }
+        .status-title.finished::before {
+            content: "🏁";
+            font-size: 1.5rem;
+        }
+
+        /* 比赛卡片容器 - 加宽卡片（核心修改） */
+        .contest-container {
+            display: grid;
+            /* 卡片最小宽度从300px改为450px，更宽；大屏最多2列 */
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 18px;
+        }
+
+        /* 比赛卡片样式 */
+        .contest-card {
+            padding: 25px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            word-break: break-all;
+            display: block;
+            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .contest-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .contest-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            opacity: 1;
+        }
+
+        .contest-card:hover::before {
+            left: 100%;
+        }
+
+        /* 比赛卡片内容样式 */
+        .contest-name {
+            font-weight: 600;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .contest-date {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .contest-desc {
+            font-size: 13px;
+            color: #50555c;
+            line-height: 1.5;
+        }
+        
+        .contest-desc span {
+            color: inherit !important;
+            font-weight: 600 !important;
+        }
+
+        /* 卡片左侧边框配色 */
+        .contest-card.finished {
+            border-left: 4px solid #52C41A;
+        }
+
+        .contest-card.not-started {
+            border-left: 4px solid #FFC116;
+        }
+
+        .contest-card.preparing {
+            border-left: 4px solid #9D3DCF;
+        }
+
+        .contest-card.ongoing {
+            border-left: 4px solid #1890ff;
+        }
+
+        /* 标签样式 */
+        .rated-tag {
+            display: inline-block;
+            background: #14d74a;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .luogu-official-tag {
+            display: inline-block;
+            background: #ff4d4f;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        /* 难度颜色样式 */
+        .diff-入门 { color: #FE4C61 !important; }
+        .diff-普及- { color: #F39C11 !important; }
+        .diff-普及/提高- { color: #FFC116 !important; }
+        .diff-普及+/提高 { color: #52C41A !important; }
+        .diff-提高+/省选- { color: #3498DB !important; }
+        .diff-省选/NOI- { color: #9D3DCF !important; }
+        .diff-NOI/NOI+/CTSC { color: #0E1D69 !important; }
+        .diff-暂无评定 { color: #BFBFBF !important; }
+        .diff-CSP-J { color: #FE4C61 !important; }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+            }
+            .contest-status-group {
+                padding: 20px 15px;
+            }
+            .status-title {
+                font-size: 1.1rem;
+            }
+            /* 移动端卡片宽度自适应 */
+            .contest-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .contest-card {
+                padding: 20px 15px;
+            }
+            .nav-item {
+                padding: 0 15px;
+                font-size: 15px;
+            }
+            .logo-img {
+                width: 30px;
+                height: 30px;
+            }
+            .logo-text {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-content {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding: 0 5px;
+            }
+            .site-logo {
+                margin-right: 15px;
+            }
+            .nav-item {
+                padding: 0 10px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a class='site-logo' href='/'>
+                <img src="https://pic1.imgdb.cn/item/67a9f4fed0e0a243d4fdff83.png" alt="Algo Beat Logo" class="logo-img">
+                <span class="logo-text">Algo Beat</span>
+            </a>
+            <a class='nav-item' href='/announcements'>公告</a>
+            <a class='nav-item' href='/problemset'>题库</a>
+            <a class='nav-item' href='/contests'>比赛</a>
+            <a class='nav-item' href='/tools'>工具箱</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <h1 class="page-title">Algo Beat Contest 比赛列表</h1>
+        
+        <!-- 1. 进行中比赛（新增分组） -->
+        <div class="contest-status-group">
+            <h2 class="status-title ongoing">进行中比赛</h2>
+            <div class="contest-container" id="ongoingContests"></div>
+        </div>
+
+        <!-- 2. 未开始比赛（包含原未开始+筹备中） -->
+        <div class="contest-status-group">
+            <h2 class="status-title not-started">未开始比赛</h2>
+            <div class="contest-container" id="notStartedContests"></div>
+        </div>
+
+        <!-- 3. 已结束比赛 -->
+        <div class="contest-status-group">
+            <h2 class="status-title finished">已结束比赛</h2>
+            <div class="contest-container" id="finishedContests"></div>
+        </div>
+    </div>
+
+    <script>
+        // 比赛数据
+        const contestData = [
+            {
+                name: "Algo Beat Contest 001",
+                date: "2025.2.3",
+                desc: "本次比赛为 IOI 赛制，共 7 道题，时长 100 分钟。整体难度为 入门 到 提高+/省选-。",
+                link: "https://www.luogu.com.cn/contest/206100",
+                status: "finished"
+            },
+            {
+                name: "Algo Beat Contest 002",
+                date: "2025.6.7",
+                desc: "本次比赛为 IOI 赛制，共 7 道题，时长 100 分钟。整体难度为 入门 到 提高+/省选-。",
+                link: "https://www.luogu.com.cn/contest/230134",
+                status: "finished"
+            },
+            {
+                name: "Algo Beat Contest 002.5",
+                date: "2025.10.5",
+                desc: "本次比赛为 IOI 赛制，共 4 道题，时长 3.5 小时。整体难度对标 CSP-J。",
+                link: "https://www.luogu.com.cn/contest/263244",
+                status: "finished"
+            },
+            {
+                name: "Algo Beat Contest 003",
+                date: "2026.3.28",
+                desc: "本次比赛为 OI 赛制，共 8 道题，时长 4 小时。整体难度为 入门 到 提高+/省选-。",
+                link: "https://www.luogu.com.cn/contest/256740",
+                status: "not-started",
+                rated: true,
+                luoguOfficial: true
+            },
+            {
+                name: "Algo Beat Contest 004 &「SJOI」Round 2",
+                date: "2026.?.?",
+                desc: "本次比赛为 IOI 赛制，共 7 道题，时长 100 分钟。整体难度为 入门 到 ?。",
+                link: "",
+                status: "preparing"
+            },
+            {
+                name: "Algo Beat Contest 005",
+                date: "202?.?.?",
+                desc: "暂无简介。",
+                link: "",
+                status: "preparing"
+            }
+        ];
+
+        // 难度着色函数
+        function addDifficultyColor(desc) {
+            desc = desc.replace(/提高\+\/省选-/g, '<span class="diff-提高+/省选-">提高+/省选-</span>');
+            
+            const difficultyMap = {
+                '入门': 'diff-入门',
+                '普及-': 'diff-普及-',
+                '普及/提高-': 'diff-普及/提高-',
+                '普及+/提高': 'diff-普及+/提高',
+                '省选/NOI-': 'diff-省选/NOI-',
+                'NOI/NOI+/CTSC': 'diff-NOI/NOI+/CTSC',
+                '暂无评定': 'diff-暂无评定',
+                'CSP-J': 'diff-CSP-J'
+            };
+            
+            Object.entries(difficultyMap).forEach(([key, cls]) => {
+                desc = desc.replace(new RegExp(key, 'g'), `<span class="${cls}">${key}</span>`);
+            });
+            
+            return desc;
+        }
+
+        // 渲染比赛卡片（核心逻辑修改）
+        function renderContestCards() {
+            // 获取容器
+            const ongoingContainer = document.getElementById('ongoingContests');
+            const notStartedContainer = document.getElementById('notStartedContests');
+            const finishedContainer = document.getElementById('finishedContests');
+            
+            // 清空容器
+            [ongoingContainer, notStartedContainer, finishedContainer].forEach(el => el.innerHTML = '');
+
+            // 生成卡片
+            contestData.forEach(contest => {
+                const card = document.createElement('a');
+                card.href = contest.link || 'javascript:void(0);';
+                if (contest.link) {
+                    card.target = "_blank";
+                    card.rel = "noopener noreferrer";
+                } else {
+                    card.style.cursor = "default";
+                }
+                // 筹备中卡片归类为未开始样式
+                card.className = `contest-card ${contest.status === 'preparing' ? 'not-started' : contest.status}`;
+                
+                // 处理标签
+                let tags = '';
+                if (contest.rated) tags += '<span class="rated-tag">Rated</span>';
+                if (contest.luoguOfficial) tags += '<span class="luogu-official-tag">洛谷官方比赛</span>';
+                
+                // 难度着色
+                const coloredDesc = addDifficultyColor(contest.desc);
+                
+                // 卡片内容
+                card.innerHTML = `
+                    <span class="contest-name">${contest.name}${tags}</span>
+                    <span class="contest-date">${contest.date}</span>
+                    <span class="contest-desc">${coloredDesc}</span>
+                `;
+                
+                // 分发卡片：筹备中 → 未开始分组
+                if (contest.status === 'finished') {
+                    finishedContainer.appendChild(card);
+                } else if (contest.status === 'not-started' || contest.status === 'preparing') {
+                    notStartedContainer.appendChild(card);
+                } else if (contest.status === 'ongoing') { // 预留进行中逻辑
+                    ongoingContainer.appendChild(card);
+                }
+            });
+            
+            // 空状态提示
+            if (ongoingContainer.children.length === 0) {
+                ongoingContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">当前无进行中的比赛。</div>';
+            }
+            if (notStartedContainer.children.length === 0) {
+                notStartedContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">近期暂无未开始的比赛。</div>';
+            }
+            if (finishedContainer.children.length === 0) {
+                finishedContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">暂无已结束的比赛。</div>';
+            }
+        }
+
+        // 初始化
+        renderContestCards();
+    </script>
+</body>
+</html>

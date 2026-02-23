@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algo Beat 公告中心</title>
+    <style>
+        /* 全局样式重置（和题库页面一致） */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+        }
+
+        /* 页面背景渐变 + 全局平滑过渡 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* 顶部导航栏样式（与题库页面统一） */
+        .top-nav {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 60px;
+        }
+
+        /* 网站logo容器 - 链接指向首页 */
+        .site-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 30px;
+            text-decoration: none;
+        }
+
+        /* 小图标样式 */
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        /* 网站名称样式 */
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* 导航项hover效果 */
+        .nav-item:hover {
+            color: #3498db;
+        }
+
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* 新增：公告页面导航项选中态（下划线常驻） */
+        .nav-item.active {
+            color: #3498db;
+        }
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* 页面容器 - 居中+阴影+圆角 */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 页面标题 - 渐变文字+阴影+间距优化 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #2c3e50;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 公告卡片样式 - 适配整体风格 */
+        .announcement-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 1000px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 公告标题样式 */
+        .announcement-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e8f4fd;
+            position: relative;
+        }
+
+        .announcement-title::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+        }
+
+        /* 公告发布时间样式 */
+        .announcement-time {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 25px;
+            display: block;
+            font-weight: 500;
+        }
+
+        /* 公告正文样式 */
+        .announcement-content {
+            color: #34495e;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        /* 响应式适配 - 移动端优化 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+            }
+            .announcement-card {
+                padding: 25px 20px;
+            }
+            .announcement-title {
+                font-size: 1.4rem;
+            }
+            .announcement-content {
+                font-size: 15px;
+            }
+            /* 移动端导航栏适配 */
+            .nav-item {
+                padding: 0 15px;
+                font-size: 15px;
+            }
+            .logo-img {
+                width: 30px;
+                height: 30px;
+            }
+            .logo-text {
+                font-size: 16px;
+            }
+        }
+
+        /* 小屏移动端导航适配 */
+        @media (max-width: 480px) {
+            .nav-content {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding: 0 5px;
+            }
+            .site-logo {
+                margin-right: 15px;
+            }
+            .nav-item {
+                padding: 0 10px;
+                white-space: nowrap;
+            }
+            .announcement-content {
+                font-size: 14px;
+                line-height: 1.7;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏（和题库页面一致，公告项添加active类） -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="site-logo">
+                <img src="https://pic1.imgdb.cn/item/67a9f4fed0e0a243d4fdff83.png" alt="Algo Beat Logo" class="logo-img">
+                <span class="logo-text">Algo Beat</span>
+            </a>
+            <a href="announcements.html" class="nav-item active">公告</a>
+            <a href="problemset.html" class="nav-item">题库</a>
+            <a href="contests.html" class="nav-item">比赛</a>
+            <a href="tools.html" class="nav-item">工具箱</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <h1 class="page-title">Algo Beat 公告中心</h1>
+        
+        <!-- 公告卡片 -->
+        <div class="announcement-card">
+            <h2 class="announcement-title">蓝桥杯省赛模拟赛举办通知</h2>
+            <span class="announcement-time">发布时间：2026年2月23日</span>
+            <div class="announcement-content">
+                洛谷官方将联合 Algo Beat Contest 出题组举办蓝桥杯省赛模拟赛，比赛时间定于2026年3月28日。本次模拟赛完全参照蓝桥杯省赛的题型、难度和时间设置，旨在帮助广大参赛选手熟悉比赛流程、检验学习成果、提升应试能力。<br><br>
+                请各位选手密切关注本公告中心，及时获取最新赛事信息。<br><br>
+                预祝各位选手在本次模拟赛中取得优异成绩，为即将到来的蓝桥杯省赛做好充分准备！
+            </div>
+        </div>
+    </div>
+</body>
+</html>

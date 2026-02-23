@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>禁止套娃</title>
+    <style>
+        /* 全局样式重置（与原页面统一） */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+        }
+
+        /* 保持一致的渐变背景 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 核心文字样式 - 保持原页面的渐变+阴影风格，放大字号 */
+        .main-text {
+            font-size: 6rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 2px;
+            /* 沿用原页面的渐变文字效果 */
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            /* 增加文字阴影提升视觉效果 */
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            /* 响应式适配 */
+            max-width: 100%;
+        }
+
+        /* 移动端字号适配 */
+        @media (max-width: 768px) {
+            .main-text {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-text {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-text">禁止套娃</div>
+</body>
+</html>

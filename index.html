@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algo Beat 出题组 - 首页</title>
+    <style>
+        /* 全局样式重置（与子页面统一） */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+        }
+
+        /* 页面背景渐变 + 全局平滑过渡 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* 顶部导航栏样式 */
+        .top-nav {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 60px;
+        }
+
+        /* 网站logo容器 */
+        .site-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 30px;
+            text-decoration: none;
+        }
+
+        /* 小图标样式 */
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        /* 网站名称样式 */
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* 导航项hover效果 */
+        .nav-item:hover {
+            color: #3498db;
+        }
+
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        /* 页面容器 - 居中+响应式宽度 */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 页面标题 - 渐变文字+阴影（与子页面统一） */
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px; /* 减少底部间距，给搜索框留出空间 */
+            color: #2c3e50;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 新增：扁平搜索框容器样式 */
+        .search-container {
+            max-width: 800px; /* 限制搜索框最大宽度 */
+            margin: 0 auto 30px auto; /* 居中，与下方分栏保持间距 */
+        }
+
+        #searchForm {
+            display: flex;
+            width: 100%;
+            gap: 0; /* 消除输入框和按钮之间的间隙 */
+        }
+
+        #searchForm input {
+            flex: 1; /* 输入框占满剩余宽度 */
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0; /* 浅边框，扁平风格 */
+            border-right: none; /* 去掉右侧边框，和按钮无缝衔接 */
+            border-radius: 6px 0 0 6px; /* 左圆角 */
+            font-size: 16px;
+            background: #f8f9fa; /* 浅背景，扁平感 */
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        /* 输入框聚焦样式 */
+        #searchForm input:focus {
+            border-color: #3498db; /* 聚焦时边框变色 */
+        }
+
+        #searchForm button {
+            padding: 10px 20px;
+            border: 1px solid #3498db;
+            border-radius: 0 6px 6px 0; /* 右圆角 */
+            background: #3498db;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            /* 扁平样式：去掉阴影 */
+            box-shadow: none;
+        }
+
+        #searchForm button:hover {
+            background: #2980b9; /*  hover时加深颜色 */
+        }
+
+        /* 新增：左右分栏容器 */
+        .two-column-container {
+            display: flex;
+            gap: 20px; /* 两个卡片之间的间距 */
+            margin: 0 auto 30px auto;
+        }
+
+        /* 核心卡片容器 - 统一卡片样式 */
+        .core-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin: 0 auto 30px auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* 调整分栏卡片的宽度 */
+        .two-column-container .core-card {
+            flex: 1; /* 两个卡片平分宽度 */
+            margin: 0; /* 清除原有margin */
+        }
+
+        /* 卡片hover提升效果 */
+        .core-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 卡片标题样式（统一视觉） */
+        .card-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e8f4fd;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 标题装饰小三角（与子页面统一） */
+        .card-title::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+        }
+
+        /* 不同卡片标题的图标区分 */
+        .card-title.intro::before { content: "📖"; font-size: 1.5rem; }
+        .card-title.recruit::before { content: "📢"; font-size: 1.5rem; }
+        .card-title.join::before { content: "✨"; font-size: 1.5rem; }
+        .card-title.hitokoto::before { content: "💬"; font-size: 1.5rem; }
+        /* 新增：友链卡片标题图标 */
+        .card-title.friendlink::before { content: "🔗"; font-size: 1.5rem; }
+
+        /* 新增：一言内容样式，与现有文字风格统一 */
+        .hitokoto-content {
+            font-size: 16px;
+            color: #34495e;
+            line-height: 1.8;
+            text-align: center;
+            padding: 10px 0;
+            font-style: italic;
+            /* 让一言内容垂直居中 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100% - 60px);
+        }
+
+        /* 新增：友链按钮容器样式 */
+        .friendlink-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap; /* 移动端自动换行 */
+            padding: 10px 0;
+            /* 让友链按钮垂直居中 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100% - 60px);
+        }
+
+        /* 新增：友链按钮样式（适配现有风格，区分不同平台） */
+        .friendlink-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 洛谷按钮渐变 */
+        .friendlink-btn.luogu {
+            background: linear-gradient(135deg, #FF7A45, #FF5722);
+        }
+        .friendlink-btn.luogu:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 87, 34, 0.25);
+            background: linear-gradient(135deg, #FF5722, #E64A19);
+        }
+
+        /* coco6de按钮渐变 */
+        .friendlink-btn.coco6de {
+            background: linear-gradient(135deg, #673AB7, #9C27B0);
+        }
+        .friendlink-btn.coco6de:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.25);
+            background: linear-gradient(135deg, #9C27B0, #8E24AA);
+        }
+
+        /* NOJ按钮渐变 */
+        .friendlink-btn.noj {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+        }
+        .friendlink-btn.noj:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.25);
+            background: linear-gradient(135deg, #388E3C, #2E7D32);
+        }
+
+        /* 团队介绍样式 */
+        .intro-content {
+            line-height: 1.8;
+            color: #34495e;
+            font-size: 15px;
+        }
+        .intro-content p {
+            margin-bottom: 15px;
+        }
+        .intro-content strong {
+            color: #2980b9;
+            font-weight: 600;
+        }
+
+        /* 入团要求样式 */
+        .recruit-content {
+            color: #34495e;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .recruit-section {
+            margin-bottom: 20px;
+        }
+        .recruit-section h4 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .recruit-section h4::before {
+            content: "•";
+            color: #3498db;
+            font-size: 20px;
+        }
+        .recruit-section ul {
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+        .recruit-section li {
+            margin-bottom: 8px;
+        }
+        .recruit-section strong {
+            color: #e74c3c;
+        }
+        .recruit-note {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            color: #2980b9;
+            font-size: 14px;
+        }
+
+        /* 加入我们区域 */
+        .join-content {
+            text-align: center;
+        }
+        /* 进一步缩小加入我们板块的图片尺寸 */
+        .join-img {
+            max-width: 40%; /* 从60%改为40%，进一步缩小 */
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px auto 0 auto; /* 调整margin，保证按钮下的居中间距 */
+            display: block; /* 确保margin auto生效，严格居中 */
+        }
+        .join-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #9D3DCF, #8e44ad);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(157, 61, 207, 0.2);
+            margin-top: 10px;
+            margin-bottom: 20px; /* 按钮下方增加间距，分隔图片 */
+        }
+        .join-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(157, 61, 207, 0.3);
+            background: linear-gradient(135deg, #8e44ad, #7d3c98);
+        }
+
+        /* 响应式适配（移动端优化） */
+        @media (max-width: 768px) {
+            /* 移动端搜索框适配 */
+            .search-container {
+                max-width: 100%; /* 移动端占满宽度 */
+            }
+
+            #searchForm input {
+                font-size: 15px;
+                padding: 8px 12px;
+            }
+
+            #searchForm button {
+                font-size: 15px;
+                padding: 8px 15px;
+            }
+
+            /* 移动端恢复单列显示 */
+            .two-column-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+            .core-card {
+                padding: 20px 15px;
+            }
+            .card-title {
+                font-size: 1.1rem;
+            }
+            .nav-item {
+                padding: 0 15px;
+                font-size: 15px;
+            }
+            .join-btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+            /* 移动端缩小logo和图片 */
+            .logo-img {
+                width: 30px;
+                height: 30px;
+            }
+            .logo-text {
+                font-size: 16px;
+            }
+            .join-img {
+                max-width: 60%; /* 移动端图片占比适配，比PC端大但仍缩小 */
+            }
+            /* 移动端友链按钮适配 */
+            .friendlink-btn {
+                padding: 10px 25px;
+                font-size: 15px;
+            }
+            .friendlink-content {
+                gap: 15px;
+            }
+        }
+
+        /* 小屏移动端导航适配 */
+        @media (max-width: 480px) {
+            .nav-content {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding: 0 5px;
+            }
+            .site-logo {
+                margin-right: 15px;
+            }
+            .nav-item {
+                padding: 0 10px;
+                white-space: nowrap;
+            }
+            .join-img {
+                max-width: 70%; /* 小屏移动端进一步适配 */
+            }
+            /* 小屏移动端友链按钮单行一个 */
+            .friendlink-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .friendlink-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <!-- 左上角网站图标+名称 -->
+            <a href="#" class="site-logo">
+                <img src="https://pic1.imgdb.cn/item/67a9f4fed0e0a243d4fdff83.png" alt="Algo Beat Logo" class="logo-img">
+                <span class="logo-text">Algo Beat</span>
+            </a>
+            <a href="announcements.html" class="nav-item">公告</a>
+            <a href="problemset.html" class="nav-item">题库</a>
+            <a href="contests.html" class="nav-item">比赛</a>
+            <a href="tools.html" class="nav-item">工具箱</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <!-- 页面标题 -->
+        <h1 class="page-title">Algo Beat 出题组 - 打造高质量算法竞赛题</h1>
+
+        <!-- 新增：扁平搜索框 -->
+        <div class="search-container">
+            <form id="searchForm" action="https://www.baidu.com/s" method="get" target="_blank">
+                <input type="text" name="wd" placeholder="输入搜索内容..." required>
+                <button type="submit">搜索</button>
+            </form>
+        </div>
+
+        <!-- 左右分栏容器 -->
+        <div class="two-column-container">
+            <!-- 一言栏目卡片（左侧） -->
+            <div class="core-card">
+                <h2 class="card-title hitokoto">算法箴言</h2>
+                <div class="hitokoto-content" id="hitokoto">加载中...</div>
+            </div>
+
+            <!-- 友情链接卡片（右侧） -->
+            <div class="core-card">
+                <h2 class="card-title friendlink">友好链接</h2>
+                <div class="friendlink-content">
+                    <a href="https://www.luogu.com.cn" target="_blank" rel="noopener noreferrer" class="friendlink-btn luogu">
+                        📚 洛谷
+                    </a>
+                    <a href="https://oj.fanplus.top/" target="_blank" rel="noopener noreferrer" class="friendlink-btn coco6de">
+                        💻 coco6de
+                    </a>
+                    <a href="http://156.227.232.38/" target="_blank" rel="noopener noreferrer" class="friendlink-btn noj">
+                        🎯 NOJ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 团队介绍卡片 -->
+        <div class="core-card">
+            <h2 class="card-title intro">关于我们</h2>
+            <div class="intro-content">
+                <p>Algo Beat 出题组是一支专注于算法竞赛题目研发的专业团队，致力于为广大 OIer 提供高质量、多层次的算法竞赛题目与比赛体验。</p>
+                <p>我们的核心成员均具备丰富的算法竞赛经验与出题经验，覆盖从 <strong>入门级（CSP-J）</strong> 到 <strong>省选/NOI 级</strong> 的全难度题目研发能力，已成功举办多场洛谷公开赛（Algo Beat Contest 系列）。</p>
+                <p>我们坚持以「专业、创新、严谨」为出题理念，力求每一道题都兼具趣味性与挑战性，帮助选手在算法学习道路上稳步提升。</p>
+            </div>
+        </div>
+
+        <!-- 入团要求卡片 -->
+        <div class="core-card">
+            <h2 class="card-title recruit">入团要求 - 招贤纳才</h2>
+            <div class="recruit-content">
+                <div class="recruit-section">
+                    <h4>必选项</h4>
+                    <ul>
+                        <li>在洛谷进行过奖项认证，CCF 程序设计能力<strong>不小于</strong> 6 级。</li>
+                        <li>在洛谷活跃，非特殊情况时一周<strong>至少</strong>要有 1 天可以上线且愿意对团队做出贡献。</li>
+                    </ul>
+                </div>
+
+                <div class="recruit-section">
+                    <h4>可选项（满足至少两项）</h4>
+                    <ul>
+                        <li>CCF 程序设计能力<strong>不小于</strong> 8 级。</li>
+                        <li>会<strong>独立</strong>写难度<strong>蓝</strong>及以上的题的 std 及题解。</li>
+                        <li>通过云剪贴板给<strong>至少一道</strong>难度<strong>黄</strong>或以上的题及题解，必须原创且高质量。<strong>若未加团成功我们保证不泄露题目</strong>（若题目质量极高，难度限制可以适当降低）。</li>
+                    </ul>
+                </div>
+
+                <div class="recruit-section">
+                    <h4>直通项（满足其一即可）</h4>
+                    <ul>
+                        <li>紫名。</li>
+                        <li>团主邀请。</li>
+                        <li>使用云剪贴板提供一道难度不小于<strong>紫</strong>的题，必须原创且有质量，需要<strong>拥有完整的题面、题解、std</strong>。</li>
+                    </ul>
+                </div>
+
+                <div class="recruit-note">
+                    <strong>注意事项：</strong><br>
+                    1. 你应当满足所有必选项和至少两项可选项 <strong>或</strong> 满足直通项即可入团（和的优先级大于或的优先级）；<br>
+                    2. 你应当在洛谷上进行奖项认证，申请入团时需设为可见；<br>
+                    3. 请务必打开 <a href="https://www.luogu.com.cn/user/623577" target="_blank" style="color: #e74c3c; font-weight: 600;">joe_zxq</a> 的私信权限。
+                </div>
+            </div>
+        </div>
+
+        <!-- 加入我们卡片 -->
+        <div class="core-card">
+            <h2 class="card-title join">加入我们</h2>
+            <div class="join-content">
+                <p style="font-size: 16px; color: #2c3e50; margin-bottom: 10px;">如果你热爱算法竞赛，有出题的热情与能力，欢迎加入我们！</p>
+                <!-- 调整顺序：先按钮，后图片 -->
+                <a href="https://www.luogu.com.cn/team/91385" target="_blank" rel="noopener noreferrer" class="join-btn">
+                    🔗 进入洛谷团队主页申请加入
+                </a>
+                <img src="https://pic1.imgdb.cn/item/67a9f4fed0e0a243d4fdff83.png" alt="Algo Beat 出题组宣传图" class="join-img">
+            </div>
+        </div>
+    </div>
+
+    <!-- 一言功能JS代码 -->
+    <script>
+        // 获取一言显示容器
+        const hitokotoElement = document.getElementById('hitokoto');
+        
+        // 调用一言API获取随机算法相关语录
+        fetch('https://v1.hitokoto.cn/?c=d') // c=d 筛选出励志/哲理类语录，更贴合算法学习场景
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('请求失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 渲染一言内容，若有出处则补充显示
+                const hitokotoText = data.from ? 
+                    `${data.hitokoto} —— ${data.from}` : 
+                    data.hitokoto;
+                hitokotoElement.textContent = hitokotoText;
+            })
+            .catch(error => {
+                // 请求失败时显示默认算法箴言
+                console.error('一言加载失败：', error);
+                hitokotoElement.textContent = '算法的本质，是用逻辑解决问题的艺术。';
+            });
+    </script>
+</body>
+</html>

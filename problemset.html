@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algo Beat Contest 题目导航（按比赛分类）</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+        }
+
+        /* 页面背景渐变 + 全局平滑过渡 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* ========== 新增：顶部导航栏样式（与首页统一） ========== */
+        .top-nav {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 60px;
+        }
+
+        /* 网站logo容器 - 链接指向首页 */
+        .site-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 30px;
+            text-decoration: none;
+        }
+
+        /* 小图标样式 */
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        /* 网站名称样式 */
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* 导航项hover效果 */
+        .nav-item:hover {
+            color: #3498db;
+        }
+
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        /* ========== 导航栏样式结束 ========== */
+
+        /* 页面容器 - 居中+阴影+圆角 */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 页面标题 - 渐变文字+阴影+间距优化 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 50px;
+            color: #2c3e50;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 比赛分组容器 - 卡片化设计 */
+        .contest-group {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin: 0 auto 30px auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* 分组hover提升效果 */
+        .contest-group:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 比赛分组标题 - 图标+配色+下划线 */
+        .contest-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e8f4fd;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 标题装饰小三角 */
+        .contest-title::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+        }
+
+        /* 标题前小图标 */
+        .contest-title::before {
+            content: "🏆";
+            font-size: 1.5rem;
+        }
+
+        /* 题目按钮容器 - 网格布局+间距优化 */
+        .problem-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        /* 题目按钮 - 升级样式 */
+        .problem-btn {
+            padding: 20px 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            word-break: break-all;
+            display: block;
+            line-height: 1.5;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 按钮高光效果 */
+        .problem-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        /* 按钮hover效果增强 */
+        .problem-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            opacity: 1;
+        }
+
+        .problem-btn:hover::before {
+            left: 100%;
+        }
+
+        /* 【核心】指定的精确难度配色 + 细微渐变 */
+        .difficulty-1 { 
+            background: linear-gradient(135deg, #FE4C61 0%, #ff6b81 100%) !important; 
+        } /* 入门 - 红 */
+        .difficulty-2 { 
+            background: linear-gradient(135deg, #F39C11 0%, #ffb84d 100%) !important; 
+        } /* 普及− - 橙 */
+        .difficulty-3 { 
+            background: linear-gradient(135deg, #FFC116 0%, #ffe066 100%) !important; 
+            color: #333 !important; 
+        } /* 普及/提高− - 黄 */
+        .difficulty-4 { 
+            background: linear-gradient(135deg, #52C41A 0%, #77de3a 100%) !important; 
+        } /* 普及+/提高 - 绿 */
+        .difficulty-5 { 
+            background: linear-gradient(135deg, #3498DB 0%, #5dade2 100%) !important; 
+        } /* 提高+/省选− - 蓝 */
+        .difficulty-6 { 
+            background: linear-gradient(135deg, #9D3DCF 0%, #b563d9 100%) !important; 
+        } /* 省选/NOI− - 紫 */
+        .difficulty-7 { 
+            background: linear-gradient(135deg, #0E1D69 0%, #1a3099 100%) !important; 
+        } /* NOI/NOI+/CTSC - 深蓝 */
+        .difficulty-0 { 
+            background: linear-gradient(135deg, #BFBFBF 0%, #d9d9d9 100%) !important; 
+        } /* 暂无评定 - 灰 */
+
+        /* 按钮内题号样式升级 */
+        .problem-id {
+            font-weight: 600;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 按钮内题目名样式升级 */
+        .problem-name {
+            font-size: 13px;
+            opacity: 0.98;
+            font-weight: 400;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 响应式适配 - 移动端优化 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+            }
+            .contest-group {
+                padding: 20px 15px;
+            }
+            .contest-title {
+                font-size: 1.1rem;
+            }
+            .problem-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            .problem-btn {
+                padding: 18px 12px;
+            }
+            /* 新增：移动端导航栏适配 */
+            .nav-item {
+                padding: 0 15px;
+                font-size: 15px;
+            }
+            .logo-img {
+                width: 30px;
+                height: 30px;
+            }
+            .logo-text {
+                font-size: 16px;
+            }
+        }
+
+        /* 新增：小屏移动端导航适配 */
+        @media (max-width: 480px) {
+            .nav-content {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding: 0 5px;
+            }
+            .site-logo {
+                margin-right: 15px;
+            }
+            .nav-item {
+                padding: 0 10px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== 新增：顶部导航栏（logo链接返回主页） ========== -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="site-logo">
+                <img src="https://pic1.imgdb.cn/item/67a9f4fed0e0a243d4fdff83.png" alt="Algo Beat Logo" class="logo-img">
+                <span class="logo-text">Algo Beat</span>
+            </a>
+            <a href="announcements.html" class="nav-item">公告</a>
+            <a href="problemset.html" class="nav-item">题库</a>
+            <a href="contests.html" class="nav-item">比赛</a>
+            <a href="tools.html" class="nav-item">工具箱</a>
+        </div>
+    </nav>
+    <!-- ========== 导航栏结束 ========== -->
+
+    <div class="page-wrapper">
+        <h1 class="page-title">Algo Beat Contest 题目导航</h1>
+        <!-- 比赛分组容器（动态生成） -->
+        <div id="contestGroupsContainer"></div>
+    </div>
+
+    <script>
+        // Algo Beat Contest 题目数据
+        const problemData = [
+            { id: 11679, name: "[Algo Beat Contest 001 A] Animal Beheaded", difficulty: 1, contest: "001" },
+            { id: 11680, name: "[Algo Beat Contest 001 B] Between Head and Tail", difficulty: 1, contest: "001" },
+            { id: 11681, name: "[Algo Beat Contest 001 C] Creating a Queue", difficulty: 3, contest: "001" },
+            { id: 11682, name: "[Algo Beat Contest 001 D] Dreamed Sequence", difficulty: 3, contest: "001" },
+            { id: 11683, name: "[Algo Beat Contest 001 E] Experiments on Collatz", difficulty: 3, contest: "001" },
+            { id: 11684, name: "[Algo Beat Contest 001 F] Foolish Math Homework", difficulty: 5, contest: "001" },
+            { id: 11685, name: "[Algo Beat Contest 001 G] Great DS Homework", difficulty: 5, contest: "001" },
+            { id: 12714, name: "[Algo Beat Contest 002 A] A to Z", difficulty: 1, contest: "002" },
+            { id: 12715, name: "[Algo Beat Contest 002 B] Bicycle Competition", difficulty: 2, contest: "002" },
+            { id: 12716, name: "[Algo Beat Contest 002 C] Counting Square Numbers", difficulty: 2, contest: "002" },
+            { id: 12717, name: "[Algo Beat Contest 002 D] Distance of Trip", difficulty: 3, contest: "002" },
+            { id: 12718, name: "[Algo Beat Contest 002 E] Excellent Game", difficulty: 5, contest: "002" },
+            { id: 12719, name: "[Algo Beat Contest 002 F] Famous Basketball Games", difficulty: 5, contest: "002" },
+            { id: 12720, name: "[Algo Beat Contest 002 G] Game Time", difficulty: 5, contest: "002" },
+            { id: 14166, name: "[Algo Beat Contest 002.5 A] 题目分配 (divide)", difficulty: 2, contest: "002.5" },
+            { id: 14167, name: "[Algo Beat Contest 002.5 B] 草莓小蛋糕 (cakes)", difficulty: 2, contest: "002.5" },
+            { id: 14168, name: "[Algo Beat Contest 002.5 C] 数数题 (count)", difficulty: 4, contest: "002.5" },
+            { id: 14169, name: "[Algo Beat Contest 002.5 D] 我要当 gamer (gamer)", difficulty: 4, contest: "002.5" }
+        ];
+
+        // 工具函数：提取去除比赛前缀后的纯题目名
+        function getPureProblemName(fullName) {
+            const regex = /\[Algo Beat Contest .+?\]\s*/;
+            return fullName.replace(regex, '');
+        }
+
+        // 按比赛分类+题号排序
+        problemData.sort((a, b) => {
+            if (a.contest !== b.contest) {
+                const contestA = parseFloat(a.contest);
+                const contestB = parseFloat(b.contest);
+                return contestA - contestB;
+            }
+            return a.id - b.id;
+        });
+
+        // 按比赛分类分组
+        const contestGroups = {};
+        problemData.forEach(problem => {
+            const contestKey = `Algo Beat Contest ${problem.contest}`;
+            if (!contestGroups[contestKey]) {
+                contestGroups[contestKey] = [];
+            }
+            contestGroups[contestKey].push(problem);
+        });
+
+        // 渲染页面
+        const container = document.getElementById("contestGroupsContainer");
+        Object.keys(contestGroups).forEach(contestName => {
+            // 创建比赛分组容器
+            const groupDiv = document.createElement("div");
+            groupDiv.className = "contest-group";
+
+            // 创建比赛分组标题
+            const titleDiv = document.createElement("h2");
+            titleDiv.className = "contest-title";
+            titleDiv.textContent = contestName;
+            groupDiv.appendChild(titleDiv);
+
+            // 创建题目按钮容器
+            const problemContainer = document.createElement("div");
+            problemContainer.className = "problem-container";
+            groupDiv.appendChild(problemContainer);
+
+            // 生成题目按钮
+            const problems = contestGroups[contestName];
+            problems.forEach(problem => {
+                const btn = document.createElement("a");
+                btn.href = `https://www.luogu.com.cn/problem/P${problem.id}`;
+                btn.target = "_blank";
+                btn.rel = "noopener noreferrer";
+                btn.className = `problem-btn difficulty-${problem.difficulty}`;
+                btn.innerHTML = `
+                    <span class="problem-id">P${problem.id}</span>
+                    <span class="problem-name">${getPureProblemName(problem.name)}</span>
+                `;
+                problemContainer.appendChild(btn);
+            });
+
+            container.appendChild(groupDiv);
+        });
+    </script>
+</body>
+</html>

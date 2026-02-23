@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algo Beat 出题组 - 画板</title>
+    <style>
+        /* 全局样式重置（与主页面统一） */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+        }
+
+        /* 页面背景渐变 + 全局平滑过渡 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏样式（与主页面完全一致） */
+        .top-nav {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 60px;
+        }
+
+        .site-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 30px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #3498db;
+        }
+
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #52c41a);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        /* 标记当前激活的导航项 */
+        .nav-item.active {
+            color: #3498db;
+        }
+
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* 页面容器 - 居中+响应式宽度 */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 页面标题 - 与主页面统一的渐变文字 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 画板容器 */
+        .canvas-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin: 0 auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .canvas-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e8f4fd;
+        }
+
+        /* 工具按钮 */
+        .tool-btn {
+            padding: 10px 18px;
+            background: #f5f7fa;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tool-btn:hover {
+            background: #e8f4fd;
+            color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .tool-btn.active {
+            background: linear-gradient(135deg, #3498db, #52c41a);
+            color: white;
+        }
+
+        /* 颜色选择器 */
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-option.active {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+        }
+
+        .custom-color {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: transparent;
+            padding: 0;
+        }
+
+        /* 画笔大小调节 */
+        .brush-size {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .size-slider {
+            width: 120px;
+            accent-color: #3498db;
+            cursor: pointer;
+        }
+
+        .size-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* 操作按钮组 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .undo-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #52c41a, #388e3c);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 画布样式 */
+        #drawingCanvas {
+            border: 1px solid #e8f4fd;
+            border-radius: 8px;
+            background: white;
+            cursor: crosshair;
+            width: 100%;
+            height: 600px;
+            touch-action: none; /* 禁用触摸默认行为 */
+        }
+
+        /* 状态栏 */
+        .status-bar {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        /* 提示框样式 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #3498db, #52c41a);
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(82, 196, 26, 0.3);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e8f4fd;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 确认对话框 */
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .confirm-dialog.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dialog-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .confirm-dialog.show .dialog-content {
+            transform: translateY(0);
+        }
+
+        .dialog-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .dialog-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn {
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .dialog-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 1024px) {
+            #drawingCanvas {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+            
+            .canvas-container {
+                padding: 20px 15px;
+            }
+            
+            #drawingCanvas {
+                height: 400px;
+            }
+            
+            .toolbar {
+                gap: 10px;
+            }
+            
+            .tool-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .action-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
+            .status-bar {
+                gap: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-content {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding: 0 5px;
+            }
+            
+            .site-logo {
+                margin-right: 15px;
+            }
+            
+            .nav-item {
+                padding: 0 10px;
+                white-space: nowrap;
+            }
+            
+            #drawingCanvas {
+                height: 300px;
+            }
+            
+            .toolbar {
+                justify-content: flex-start;
+            }
+            
+            .action-buttons {
+                margin-left: 0;
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" class="site-logo">
+                <img src="https://pic1.imgdb.cn/item/67a9f4fed0e0a243d4fdff83.png" alt="Algo Beat Logo" class="logo-img">
+                <span class="logo-text">Algo Beat</span>
+            </a>
+            <a href="announcements.html" class="nav-item">公告</a>
+            <a href="problemset.html" class="nav-item">题库</a>
+            <a href="contests.html" class="nav-item">比赛</a>
+            <a href="tools.html" class="nav-item">工具箱</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <!-- 页面标题 -->
+        <h1 class="page-title">Algo Beat 画板 - 在线绘图工具</h1>
+
+        <!-- 画板核心区域 -->
+        <div class="canvas-container">
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <!-- 绘图工具 -->
+                <button class="tool-btn active" data-tool="brush" id="brushTool">
+                    🖌️ 画笔
+                </button>
+                <button class="tool-btn" data-tool="eraser" id="eraserTool">
+                    🧽 橡皮擦
+                </button>
+                <button class="tool-btn" data-tool="line" id="lineTool">
+                    📏 直线
+                </button>
+                <button class="tool-btn" data-tool="rectangle" id="rectangleTool">
+                    🟦 矩形
+                </button>
+                <button class="tool-btn" data-tool="circle" id="circleTool">
+                    🟡 圆形
+                </button>
+
+                <!-- 颜色选择 -->
+                <div class="color-picker">
+                    <div class="color-option active" style="background: #000000;" data-color="#000000"></div>
+                    <div class="color-option" style="background: #ff0000;" data-color="#ff0000"></div>
+                    <div class="color-option" style="background: #0000ff;" data-color="#0000ff"></div>
+                    <div class="color-option" style="background: #00ff00;" data-color="#00ff00"></div>
+                    <div class="color-option" style="background: #ffa500;" data-color="#ffa500"></div>
+                    <div class="color-option" style="background: #800080;" data-color="#800080"></div>
+                    <div class="color-option" style="background: #ffffff; border: 1px solid #ddd;" data-color="#ffffff"></div>
+                    <input type="color" class="custom-color" id="customColor" value="#000000">
+                </div>
+
+                <!-- 画笔大小 -->
+                <div class="brush-size">
+                    <span>粗细:</span>
+                    <input type="range" min="1" max="40" value="5" class="size-slider" id="brushSize">
+                    <span class="size-value" id="sizeValue">5px</span>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons">
+                    <button class="action-btn undo-btn" id="undoBtn">
+                        ↩️ 撤销 (Ctrl+Z)
+                    </button>
+                    <button class="action-btn clear-btn" id="clearBtn">
+                        🗑️ 清空画布
+                    </button>
+                    <button class="action-btn save-btn" id="saveBtn">
+                        💾 保存图片
+                    </button>
+                </div>
+            </div>
+
+            <!-- 画布 -->
+            <canvas id="drawingCanvas"></canvas>
+
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">当前工具:</span>
+                    <span id="currentTool">画笔</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">画笔大小:</span>
+                    <span id="statusSize">5px</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">当前颜色:</span>
+                    <span id="statusColor" style="background: #000000; width: 16px; height: 16px; display: inline-block; border-radius: 50%; vertical-align: middle;"></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">笔画数量:</span>
+                    <span id="strokeCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">快捷键:</span>
+                    <span>Ctrl+Z 撤销</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <!-- 确认对话框 -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="dialog-content">
+            <div class="dialog-title">确认清空画布？</div>
+            <p>此操作将删除所有绘图内容，且无法恢复。</p>
+            <div class="dialog-buttons">
+                <button class="dialog-btn cancel-btn" id="cancelBtn">取消</button>
+                <button class="dialog-btn confirm-btn" id="confirmClearBtn">确认清空</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const loader = document.getElementById('loader');
+        const toast = document.getElementById('toast');
+        const confirmDialog = document.getElementById('confirmDialog');
+        
+        // 工具元素
+        const toolButtons = document.querySelectorAll('.tool-btn');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const customColor = document.getElementById('customColor');
+        const brushSize = document.getElementById('brushSize');
+        const sizeValue = document.getElementById('sizeValue');
+        const undoBtn = document.getElementById('undoBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmClearBtn = document.getElementById('confirmClearBtn');
+        
+        // 状态栏元素
+        const currentTool = document.getElementById('currentTool');
+        const statusSize = document.getElementById('statusSize');
+        const statusColor = document.getElementById('statusColor');
+        const strokeCount = document.getElementById('strokeCount');
+        
+        // 绘画状态
+        let isDrawing = false;
+        let currentTool = 'brush';
+        let currentColor = '#000000';
+        let currentSize = 5;
+        let startX = 0;
+        let startY = 0;
+        
+        // 历史记录
+        let drawingHistory = [];
+        let historyIndex = -1;
+        
+        // 初始化画布
+        function initCanvas() {
+            // 设置画布尺寸
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 加载保存的绘图
+            loadDrawing();
+            
+            // 隐藏加载动画
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 500);
+            
+            // 更新状态栏
+            updateStatus();
+            
+            // 绑定事件
+            bindEvents();
+        }
+        
+        // 调整画布尺寸
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const containerWidth = container.clientWidth - 30; // 减去内边距
+            
+            // 保存当前画布内容
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            // 设置新尺寸
+            canvas.width = containerWidth;
+            canvas.height = canvas.height || 600;
+            
+            // 恢复画布内容
+            ctx.drawImage(tempCanvas, 0, 0);
+            
+            // 重新应用所有历史记录
+            redrawFromHistory();
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            // 工具选择
+            toolButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    toolButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTool = btn.dataset.tool;
+                    updateStatus();
+                    showToast(`已切换到${btn.textContent.trim().split(' ')[1]}`);
+                });
+            });
+            
+            // 颜色选择
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(o => o.classList.remove('active'));
+                    option.classList.add('active');
+                    currentColor = option.dataset.color;
+                    customColor.value = currentColor;
+                    statusColor.style.background = currentColor;
+                    updateStatus();
+                });
+            });
+            
+            // 自定义颜色
+            customColor.addEventListener('input', () => {
+                colorOptions.forEach(o => o.classList.remove('active'));
+                currentColor = customColor.value;
+                statusColor.style.background = currentColor;
+                updateStatus();
+            });
+            
+            // 画笔大小
+            brushSize.addEventListener('input', () => {
+                currentSize = parseInt(brushSize.value);
+                sizeValue.textContent = `${currentSize}px`;
+                statusSize.textContent = `${currentSize}px`;
+                updateStatus();
+            });
+            
+            // 撤销按钮
+            undoBtn.addEventListener('click', undo);
+            
+            // 清空按钮
+            clearBtn.addEventListener('click', () => {
+                confirmDialog.classList.add('show');
+            });
+            
+            // 取消清空
+            cancelBtn.addEventListener('click', () => {
+                confirmDialog.classList.remove('show');
+            });
+            
+            // 确认清空
+            confirmClearBtn.addEventListener('click', () => {
+                clearCanvas();
+                confirmDialog.classList.remove('show');
+                showToast('画布已清空');
+            });
+            
+            // 保存按钮
+            saveBtn.addEventListener('click', saveCanvas);
+            
+            // 键盘快捷键
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'z') {
+                    e.preventDefault();
+                    undo();
+                }
+            });
+            
+            // 画布事件 - 鼠标
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // 画布事件 - 触摸
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', handleTouchEnd);
+        }
+        
+        // 开始绘画
+        function startDrawing(e) {
+            isDrawing = true;
+            
+            // 获取相对画布的坐标
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            
+            // 对于形状工具，记录起始点
+            if (currentTool !== 'brush' && currentTool !== 'eraser') {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+            } else if (currentTool === 'brush') {
+                // 画笔工具 - 开始路径
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = currentColor;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            } else if (currentTool === 'eraser') {
+                // 橡皮擦工具
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+            
+            // 保存当前状态到历史记录
+            saveState();
+        }
+        
+        // 绘画中
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (currentTool === 'brush' || currentTool === 'eraser') {
+                // 自由绘画
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            } else if (currentTool === 'line') {
+                // 直线工具 - 实时预览
+                redrawFromHistory(); // 清除预览
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(x, y);
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = currentColor;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            } else if (currentTool === 'rectangle') {
+                // 矩形工具 - 实时预览
+                redrawFromHistory(); // 清除预览
+                ctx.beginPath();
+                ctx.rect(startX, startY, x - startX, y - startY);
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = currentColor;
+                ctx.stroke();
+            } else if (currentTool === 'circle') {
+                // 圆形工具 - 实时预览
+                redrawFromHistory(); // 清除预览
+                const radiusX = Math.abs(x - startX);
+                const radiusY = Math.abs(y - startY);
+                const radius = Math.min(radiusX, radiusY);
+                
+                ctx.beginPath();
+                ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = currentColor;
+                ctx.stroke();
+            }
+        }
+        
+        // 停止绘画
+        function stopDrawing() {
+            if (!isDrawing) return;
+            
+            isDrawing = false;
+            
+            // 对于形状工具，保存最终绘制
+            if (currentTool !== 'brush' && currentTool !== 'eraser') {
+                saveState();
+            }
+            
+            // 自动保存
+            saveDrawing();
+            
+            // 更新笔画计数
+            updateStrokeCount();
+        }
+        
+        // 触摸事件处理
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            canvas.dispatchEvent(mouseEvent);
+        }
+        
+        // 保存当前状态到历史记录
+        function saveState() {
+            // 移除当前索引之后的历史记录
+            if (historyIndex < drawingHistory.length - 1) {
+                drawingHistory = drawingHistory.slice(0, historyIndex + 1);
+            }
+            
+            // 保存当前画布状态
+            const dataURL = canvas.toDataURL('image/png');
+            drawingHistory.push(dataURL);
+            historyIndex = drawingHistory.length - 1;
+        }
+        
+        // 撤销操作
+        function undo() {
+            if (historyIndex <= 0) {
+                showToast('已撤销到最初状态', 'error');
+                return;
+            }
+            
+            historyIndex--;
+            const prevState = drawingHistory[historyIndex];
+            
+            // 恢复上一个状态
+            const img = new Image();
+            img.onload = function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                saveDrawing(); // 同步保存
+                updateStrokeCount();
+                showToast('已撤销上一步操作');
+            };
+            img.src = prevState;
+        }
+        
+        // 从历史记录重绘
+        function redrawFromHistory() {
+            if (drawingHistory.length === 0) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = drawingHistory[historyIndex];
+        }
+        
+        // 清空画布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 清空历史记录
+            drawingHistory = [];
+            historyIndex = -1;
+            
+            // 保存清空状态
+            saveState();
+            saveDrawing();
+            
+            // 更新计数
+            updateStrokeCount();
+        }
+        
+        // 保存画布为图片
+        function saveCanvas() {
+            try {
+                // 创建下载链接
+                const link = document.createElement('a');
+                
+                // 生成文件名
+                const date = new Date();
+                const formattedDate = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}`;
+                const fileName = `Algobeat画板_${formattedDate}.png`;
+                
+                // 设置下载属性
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                
+                // 触发下载
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('图片保存成功');
+            } catch (error) {
+                showToast('保存失败，请重试', 'error');
+                console.error('保存图片失败:', error);
+            }
+        }
+        
+        // 保存绘图到本地存储
+        function saveDrawing() {
+            try {
+                const drawingData = {
+                    canvasData: canvas.toDataURL('image/png'),
+                    history: drawingHistory,
+                    historyIndex: historyIndex,
+                    tool: currentTool,
+                    color: currentColor,
+                    size: currentSize
+                };
+                localStorage.setItem('algobeatCanvasData', JSON.stringify(drawingData));
+            } catch (error) {
+                console.error('保存绘图失败:', error);
+            }
+        }
+        
+        // 从本地存储加载绘图
+        function loadDrawing() {
+            try {
+                const savedData = localStorage.getItem('algobeatCanvasData');
+                if (savedData) {
+                    const drawingData = JSON.parse(savedData);
+                    
+                    // 恢复画布内容
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = drawingData.canvasData;
+                    
+                    // 恢复历史记录
+                    drawingHistory = drawingData.history || [];
+                    historyIndex = drawingData.historyIndex || -1;
+                    
+                    // 恢复工具状态
+                    if (drawingData.tool) {
+                        currentTool = drawingData.tool;
+                        toolButtons.forEach(btn => {
+                            if (btn.dataset.tool === currentTool) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        });
+                    }
+                    
+                    // 恢复颜色
+                    if (drawingData.color) {
+                        currentColor = drawingData.color;
+                        customColor.value = currentColor;
+                        colorOptions.forEach(option => {
+                            if (option.dataset.color === currentColor) {
+                                option.classList.add('active');
+                            } else {
+                                option.classList.remove('active');
+                            }
+                        });
+                        statusColor.style.background = currentColor;
+                    }
+                    
+                    // 恢复画笔大小
+                    if (drawingData.size) {
+                        currentSize = drawingData.size;
+                        brushSize.value = currentSize;
+                        sizeValue.textContent = `${currentSize}px`;
+                        statusSize.textContent = `${currentSize}px`;
+                    }
+                    
+                    // 更新计数
+                    updateStrokeCount();
+                    
+                    showToast('已恢复上次的绘图内容');
+                } else {
+                    // 初始状态保存
+                    saveState();
+                }
+            } catch (error) {
+                console.error('加载绘图失败:', error);
+                saveState(); // 初始化历史记录
+            }
+        }
+        
+        // 显示提示框
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = 'toast';
+            if (type === 'error') {
+                toast.classList.add('error');
+            }
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 更新状态栏
+        function updateStatus() {
+            // 更新当前工具显示
+            const toolNames = {
+                'brush': '画笔',
+                'eraser': '橡皮擦',
+                'line': '直线',
+                'rectangle': '矩形',
+                'circle': '圆形'
+            };
+            document.getElementById('currentTool').textContent = toolNames[currentTool];
+            
+            // 更新大小显示
+            statusSize.textContent = `${currentSize}px`;
+            
+            // 更新颜色显示
+            statusColor.style.background = currentColor;
+        }
+        
+        // 更新笔画计数
+        function updateStrokeCount() {
+            const count = Math.max(0, historyIndex);
+            strokeCount.textContent = count;
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', initCanvas);
+        
+        // 页面关闭前保存
+        window.addEventListener('beforeunload', saveDrawing);
+    </script>
+</body>
+</html>
