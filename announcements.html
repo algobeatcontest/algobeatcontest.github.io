@@ -128,11 +128,14 @@
 
         /* 公告卡片样式 - 适配整体风格 */
         .announcement-card {
+            /* 修改：将底部间距从20px调整为30px，增加卡片间间隔 */
+            margin-bottom: 30px;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             padding: 30px;
-            margin: 0 auto;
+            margin-left: auto;
+            margin-right: auto;
             max-width: 1000px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -188,6 +191,8 @@
             }
             .announcement-card {
                 padding: 25px 20px;
+                /* 移动端适配：调整为20px间距，更适合小屏幕 */
+                margin-bottom: 20px;
             }
             .announcement-title {
                 font-size: 1.4rem;
@@ -242,6 +247,7 @@
             <a href="problemset.html" class="nav-item">题库</a>
             <a href="contests.html" class="nav-item">比赛</a>
             <a href="tools.html" class="nav-item">工具箱</a>
+            <a class='nav-item' href='https://algobeat.freeflarum.com/'>讨论</a>
         </div>
     </nav>
 
@@ -258,6 +264,18 @@
                 预祝各位选手在本次模拟赛中取得优异成绩，为即将到来的蓝桥杯省赛做好充分准备！
             </div>
         </div>
+
+        <!-- 公告卡片 -->
+        <div class="announcement-card">
+            <h2 class="announcement-title">Algo Beat Contest 论坛上线通知</h2>
+            <span class="announcement-time">发布时间：2026年2月28日</span>
+            <div class="announcement-content">
+                Algo Beat Contest 论坛于2026年2月28日正式上线，可以注册账号、发帖、回帖、写博客，评论博客、点赞、关注、反馈问题等。<br><br>
+                点击上方导航栏中的“讨论”即可访问！<br><br>
+            </div>
+        </div>
+
     </div>
+
 </body>
 </html>
