@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愚人节快乐！😜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* 抖动整蛊特效 */
+        .shake {
+            animation: shake 0.1s infinite alternate;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-2px, 2px); }
+        }
+
+        /* 标题样式 */
+        .title {
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+            animation: colorChange 2s infinite;
+        }
+
+        @keyframes colorChange {
+            0% { color: #ff3c38; }
+            25% { color: #ff9500; }
+            50% { color: #00c6ff; }
+            75% { color: #7700ff; }
+            100% { color: #ff3c38; }
+        }
+
+        /* 搞笑图片 */
+        .fool-img {
+            width: 300px;
+            height: 300px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .fool-img:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        /* 提示文字 */
+        .tip {
+            font-size: 22px;
+            color: #333;
+            margin-top: 10px;
+            animation: fade 1.5s infinite alternate;
+        }
+
+        @keyframes fade {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            z-index: 999;
+            text-align: center;
+            display: none;
+        }
+
+        .modal h2 {
+            color: #ff3c38;
+            margin-bottom: 20px;
+        }
+
+        .modal p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            padding: 10px 25px;
+            background: #ff3c38;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* 遮罩层 */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none;
+        }
+    </style>
+</head>
+<body class="shake">
+    <!-- 弹窗整蛊 -->
+    <div class="mask" id="mask"></div>
+    <div class="modal" id="modal">
+        <h2>😱 警告！你的电脑被我占领了</h2>
+        <p>愚人节快乐！！！骗你的啦～</p>
+        <p>今天你被整蛊了吗？😜</p>
+        <button class="close-btn" onclick="closeModal()">知道啦！</button>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="title" id="title">愚人节快乐 🎉</div>
+    <img src="https://picsum.photos/id/237/300/300" alt="愚人节搞笑" class="fool-img">
+    <div class="tip">点击屏幕有惊喜哦～</div>
+
+    <script>
+        // 自动切换搞笑标题
+        const titles = [
+            "愚人节快乐 🎉",
+            "今天你被耍了吗？😜",
+            "小心！到处都是陷阱！⚠️",
+            "整蛊大师在此！😎",
+            "愚人节快乐！骗你哒～😝"
+        ];
+        let index = 0;
+        setInterval(() => {
+            document.getElementById("title").innerText = titles[index];
+            index = (index + 1) % titles.length;
+        }, 1500);
+
+        // 点击弹窗整蛊
+        document.body.onclick = function() {
+            document.getElementById("mask").style.display = "block";
+            document.getElementById("modal").style.display = "block";
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById("mask").style.display = "none";
+            document.getElementById("modal").style.display = "none";
+        }
+    </script>
+</body>
+</html>
