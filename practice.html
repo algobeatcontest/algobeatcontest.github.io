@@ -88,10 +88,18 @@
             background: #f8f9fa;
         }
 
-        /* 列宽度控制（已缩短题目名称） */
-        th:nth-child(1), td:nth-child(1) { width: 120px; } /* 题号 */
-        th:nth-child(2), td:nth-child(2) { width: 60%; } /* 题目名称（缩短后） */
-        th:nth-child(3), td:nth-child(3) { width: 280px; } /* 难度 */
+        /* 列宽度控制 */
+        th:nth-child(1), td:nth-child(1) { width: 120px; }
+        th:nth-child(2), td:nth-child(2) { width: 60%; }
+        th:nth-child(3), td:nth-child(3) { width: 280px; }
+
+        a {
+            color: #2d8cf1;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
 
         /* 难度颜色：灰、红、橙、黄、绿、浅蓝、紫、黑 */
         .diff-0 { color: #999; }        /* 暂无评定 */
@@ -136,7 +144,6 @@
                     throw new Error("未找到做题数据，请确保粘贴的是洛谷【个人练习】页面完整源码");
                 }
 
-                // 解析JSON并自动转义Unicode汉字（修复乱码关键）
                 function safeParse(str) {
                     str = str.replace(/\\\n/g, '');
                     str = str.replace(/\n/g, '');
@@ -149,7 +156,6 @@
                 const passed = safeParse(passedMatch[1]);
                 const totalAC = passed.length;
 
-                // 难度名称
                 const diffMap = [
                     "暂无评定",
                     "入门",
@@ -161,14 +167,12 @@
                     "NOI/NOI+/CTSC"
                 ];
 
-                // 统计
                 const diffCount = {};
                 passed.forEach(p => {
                     const d = p.difficulty || 0;
                     diffCount[d] = (diffCount[d] || 0) + 1;
                 });
 
-                // 统计卡片
                 let statsHtml = `<div class="card"><h3>通过题目总数</h3><div class="num">${totalAC}</div></div>`;
                 for (let d = 0; d <= 7; d++) {
                     const name = diffMap[d];
@@ -181,7 +185,6 @@
                 }
                 statsDiv.innerHTML = statsHtml;
 
-                // 分类 P → B → AT → CF
                 const P = [], B = [], AT = [], CF = [], OTHER = [];
                 passed.forEach(item => {
                     const pid = item.pid || "";
@@ -192,7 +195,6 @@
                     else OTHER.push(item);
                 });
 
-                // 数字排序
                 function sortByNum(arr) {
                     return arr.sort((a, b) => {
                         const numA = parseInt((a.pid || "").replace(/\D/g, "")) || 0;
@@ -206,17 +208,17 @@
                 const sortedAT = sortByNum(AT);
                 const sortedCF = sortByNum(CF);
 
-                // 生成表格
                 function makeTable(title, list) {
                     if (list.length === 0) return "";
                     let html = `<div class="section-title">${title}（共 ${list.length} 题）</div>`;
                     html += `<table><tr><th>题号</th><th>题目名称</th><th>难度</th></tr>`;
                     list.forEach(p => {
                         const d = p.difficulty || 0;
+                        const url = `https://www.luogu.com.cn/problem/${p.pid}`;
                         html += `
                         <tr>
                             <td>${p.pid}</td>
-                            <td>${p.title}</td>
+                            <td><a href="${url}" target="_blank">${p.title}</a></td>
                             <td class="diff-${d}">${diffMap[d]}</td>
                         </tr>`;
                     });
