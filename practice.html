@@ -23,7 +23,23 @@
         h1 {
             color: #333;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
+        }
+        .guide {
+            background: #e8f4fd;
+            border-left: 5px solid #2d8cf1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .guide h3 {
+            margin: 0 0 8px 0;
+            color: #2d8cf1;
+        }
+        .guide p {
+            margin: 4px 0;
         }
         textarea {
             width: 100%;
@@ -122,6 +138,18 @@
 <body>
     <div class="container">
         <h1>📊 洛谷做题情况解析器</h1>
+
+        <!-- 使用说明（已放在最上方） -->
+        <div class="guide">
+            <h3>📌 使用方法</h3>
+            <p>1. 打开洛谷官网，进入你的【个人练习】页面（https://www.luogu.com.cn/user/填入你的UID/practice）</p>
+            <p>2. 在该页面空白处 <strong>右键 → 查看网页源代码</strong>（或按快捷键 Ctrl+U）</p>
+            <p>3. <strong>全选源代码</strong>（Ctrl+A），然后 <strong>复制</strong>（Ctrl+C）</p>
+            <p>4. 将复制的内容 <strong>粘贴</strong> 到下方输入框中（Ctrl+V）</p>
+            <p>5. 点击 <strong>开始解析</strong> 按钮，即可生成你的做题统计与题目列表</p>
+            <p style="color:red; font-weight:bold;">注意：必须是【个人练习】页面的源代码，其他页面无法解析！</p>
+        </div>
+
         <textarea id="input" placeholder="在此粘贴洛谷【个人练习】页面完整源码..."></textarea>
         <button onclick="parse()">开始解析</button>
 
