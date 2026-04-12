@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtCoder ↔ 洛谷 网址转换器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 650px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        /* 模式切换 */
+        .mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: #e1e5ee;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: #409eff;
+            color: white;
+        }
+
+        /* 输入区域 */
+        .input-box {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5ee;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #409eff;
+        }
+
+        /* 手动输入布局 */
+        .manual-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .manual-row .input-box {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        /* 按钮 */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #convertBtn {
+            background-color: #409eff;
+            color: white;
+        }
+
+        #convertBtn:hover {
+            background-color: #338ecc;
+        }
+
+        #copyBtn {
+            background-color: #67c23a;
+            color: white;
+        }
+
+        #copyBtn:hover {
+            background-color: #5aa832;
+        }
+
+        /* 结果区域 */
+        .result-box {
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            border-left: 4px solid #409eff;
+            word-break: break-all;
+            min-height: 50px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .result-box a {
+            color: #409eff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .result-box a:hover {
+            text-decoration: underline;
+        }
+
+        .tip {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #909399;
+            text-align: center;
+        }
+
+        .error {
+            color: #f56c6c;
+            border-left-color: #f56c6c;
+            background-color: #fef0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AtCoder → 洛谷 网址转换</h1>
+
+        <!-- 模式切换 -->
+        <div class="mode-tabs">
+            <div class="tab active" data-target="url-panel">网址转换</div>
+            <div class="tab" data-target="manual-panel">编号手动转换</div>
+        </div>
+
+        <!-- 网址输入面板 -->
+        <div class="panel active" id="url-panel">
+            <div class="input-box">
+                <label>输入 AtCoder 题目网址：</label>
+                <input type="text" id="atcoderUrl" placeholder="例如：https://atcoder.jp/contests/abc430/tasks/abc430_f" />
+            </div>
+        </div>
+
+        <!-- 手动编号输入面板 -->
+        <div class="panel" id="manual-panel">
+            <div class="manual-row">
+                <div class="input-box">
+                    <label>比赛类型：</label>
+                    <select id="contestType">
+                        <option value="abc">ABC</option>
+                        <option value="arc">ARC</option>
+                        <option value="agc">AGC</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <label>比赛场次（数字）：</label>
+                    <input type="number" id="contestNum" placeholder="例如：430" min="1" />
+                </div>
+                <div class="input-box">
+                    <label>题目字母：</label>
+                    <select id="problemChar">
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                        <option value="d">D</option>
+                        <option value="e">E</option>
+                        <option value="f">F</option>
+                        <option value="g">G</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button id="convertBtn">立即转换</button>
+            <button id="copyBtn">复制结果</button>
+        </div>
+
+        <div class="result-box" id="result">转换结果将显示在这里</div>
+        <div class="tip">支持 ABC / ARC / AGC 全自动转换，结果可直接点击访问</div>
+    </div>
+
+    <script>
+        // ========== 元素获取 ==========
+        const tabs = document.querySelectorAll('.tab');
+        const panels = document.querySelectorAll('.panel');
+        const atcoderInput = document.getElementById('atcoderUrl');
+        const convertBtn = document.getElementById('convertBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const resultBox = document.getElementById('result');
+
+        const contestType = document.getElementById('contestType');
+        const contestNum = document.getElementById('contestNum');
+        const problemChar = document.getElementById('problemChar');
+
+        // ========== 模式切换 ==========
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                let target = tab.dataset.target;
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(target).classList.add('active');
+                resultBox.textContent = "转换结果将显示在这里";
+                resultBox.className = "result-box";
+            });
+        });
+
+        // ========== 核心：网址转换 ==========
+        function convertFromUrl(url) {
+            url = url.trim();
+            if (!url) {
+                showError("请输入 AtCoder 题目网址！");
+                return;
+            }
+            const match = url.match(/contests\/([a-zA-Z0-9]+)\/tasks\/(\1_[a-zA-Z0-9]+)/);
+            if (match && match[2]) {
+                showSuccess(match[2]);
+            } else {
+                showError("网址格式错误！");
+            }
+        }
+
+        // ========== 核心：手动编号转换 ==========
+        function convertFromManual() {
+            const type = contestType.value;
+            const num = contestNum.value.trim();
+            const ch = problemChar.value;
+
+            if (!num) {
+                showError("请输入比赛场次！");
+                return;
+            }
+
+            const fullId = `${type}${num}_${ch}`;
+            showSuccess(fullId);
+        }
+
+        // ========== 显示成功结果（可点击链接） ==========
+        function showSuccess(problemId) {
+            const url = `https://www.luogu.com.cn/problem/AT_${problemId}`;
+            resultBox.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+            resultBox.className = "result-box";
+            window.currentResult = url;
+        }
+
+        // ========== 显示错误 ==========
+        function showError(msg) {
+            resultBox.textContent = msg;
+            resultBox.className = "result-box error";
+            window.currentResult = null;
+        }
+
+        // ========== 统一转换入口 ==========
+        function convert() {
+            if (document.getElementById('url-panel').classList.contains('active')) {
+                convertFromUrl(atcoderInput.value);
+            } else {
+                convertFromManual();
+            }
+        }
+
+        // ========== 复制功能 ==========
+        function copyResult() {
+            if (!window.currentResult) {
+                alert("暂无有效结果可复制");
+                return;
+            }
+            navigator.clipboard.writeText(window.currentResult).then(() => {
+                alert("复制成功！");
+            }).catch(() => {
+                alert("复制失败，请手动复制");
+            });
+        }
+
+        // ========== 事件绑定 ==========
+        convertBtn.addEventListener('click', convert);
+        copyBtn.addEventListener('click', copyResult);
+
+        // 回车转换
+        atcoderInput.addEventListener('keyup', e => {
+            if (e.key === 'Enter') convert();
+        });
+        contestNum.addEventListener('keyup', e => {
+            if (e.key === 'Enter') convert();
+        });
+    </script>
+</body>
+</html>
