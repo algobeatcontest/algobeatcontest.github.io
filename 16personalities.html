@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>OI竞赛16人格测试 | 信息学选手专属MBTI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+            color: #e3e6f0;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(18, 25, 45, 0.75);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(72, 187, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #c0e0ff, #7aa9ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .sub {
+            color: #8f9bb5;
+            border-left: 3px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 0.5rem 0 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* 维度卡片 */
+        .dim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .dim-card {
+            background: #0f1629;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            border-left: 4px solid;
+            transition: 0.2s;
+        }
+        .dim-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .dim-card p {
+            font-size: 0.75rem;
+            color: #a5b4d0;
+            line-height: 1.4;
+        }
+        .badge {
+            font-family: monospace;
+            font-weight: bold;
+            background: #1e2a44;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        /* 按钮 */
+        .btn {
+            background: #1e2a47;
+            border: none;
+            color: #e2e8ff;
+            font-family: inherit;
+            font-weight: 500;
+            padding: 0.8rem 1.8rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+            border: 1px solid #2d3b5a;
+        }
+        .btn-primary {
+            background: #2b4b9e;
+            box-shadow: 0 4px 12px rgba(43, 75, 158, 0.3);
+            border-color: #3b82f6;
+        }
+        .btn-primary:hover {
+            background: #3b62c4;
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #4b6a9e;
+        }
+        .btn-outline:hover {
+            background: #1e2f4b;
+            border-color: #7aa9ff;
+        }
+        .question-area, .result-area {
+            margin-top: 1rem;
+        }
+        .progress {
+            background: #0a1020;
+            border-radius: 40px;
+            height: 6px;
+            width: 100%;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            background: #3b82f6;
+            width: 0%;
+            height: 6px;
+            border-radius: 40px;
+            transition: width 0.2s;
+        }
+        .q-num {
+            font-size: 0.8rem;
+            color: #7d8fb3;
+            margin-bottom: 0.5rem;
+        }
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 500;
+            line-height: 1.4;
+            margin: 1rem 0 1.8rem 0;
+            background: #0c1222;
+            padding: 1rem;
+            border-radius: 1.2rem;
+            border: 1px solid #253553;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .opt-btn {
+            background: #111827;
+            border: 1px solid #2c3e5c;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #eef3ff;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .opt-btn:hover {
+            background: #1e2a44;
+            border-color: #5d8eff;
+            transform: scale(0.99);
+        }
+        .opt-prefix {
+            font-weight: bold;
+            background: #2d3f60;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+        }
+        .result-card {
+            background: #0b1122;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #2f4b7c;
+        }
+        .personality {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0.5rem 0;
+        }
+        .desc {
+            background: #0e1629;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .flex-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .hidden {
+            display: none;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 2rem;
+            color: #4d5a7c;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 1.2rem; }
+            .question-text { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- 介绍区域 -->
+    <div id="introArea">
+        <h1>🧩 OI·16人格</h1>
+        <div class="sub">信息学竞赛专属人格分析 · 基于四个核心维度</div>
+        <p style="margin-bottom: 1rem;">不同于传统MBTI，本模型针对竞赛场景设计，通过 <strong>解题思路(T/P) · 代码风格(C/R) · 验证策略(V/S) · 学习策略(B/D)</strong> 组合出16种竞赛选手类型。</p>
+        <div class="dim-grid">
+            <div class="dim-card" style="border-left-color: #60a5fa;"><h3>📐 思路 T/P</h3><p><strong>T理论派</strong> 先证明后编码<br><strong>P实践派</strong> 边写边试</p><div class="badge">第一字母</div></div>
+            <div class="dim-card" style="border-left-color: #34d399;"><h3>✍️ 风格 C/R</h3><p><strong>C简洁派</strong> 短小精悍<br><strong>R稳健派</strong> 规范安全</p><div class="badge">第二字母</div></div>
+            <div class="dim-card" style="border-left-color: #f97316;"><h3>⚙️ 验证 V/S</h3><p><strong>V验证派</strong> 对拍/极端自测<br><strong>S提交派</strong> 依赖OJ反馈</p><div class="badge">第三字母</div></div>
+            <div class="dim-card" style="border-left-color: #c084fc;"><h3>📚 学习 B/D</h3><p><strong>B广度派</strong> 刷遍题型<br><strong>D深度派</strong> 专精少数领域</p><div class="badge">第四字母</div></div>
+        </div>
+        <p style="font-size: 0.85rem; background: #0e162f; padding: 0.8rem; border-radius: 1rem;">✨ 20道情景选择题，测出你的竞赛人格 (如 <strong>TCVB</strong> , <strong>PRSD</strong> ...) 并获得专属分析。</p>
+        <div style="text-align: center; margin: 2rem 0 1rem 0;">
+            <button class="btn btn-primary" id="startBtn">▶ 开始测试</button>
+        </div>
+    </div>
+
+    <!-- 答题区域 (初始隐藏) -->
+    <div id="quizArea" class="hidden">
+        <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="q-num" id="qNum">第1 / 20题</div>
+        <div class="question-text" id="questionText">加载中...</div>
+        <div class="options" id="optionsContainer"></div>
+        <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+            <button class="btn btn-outline" id="prevBtn" style="visibility: hidden;">◀ 上一题</button>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- 结果区域 -->
+    <div id="resultArea" class="hidden">
+        <div class="result-card">
+            <h2>✨ 你的竞赛人格类型 ✨</h2>
+            <div class="personality" id="personalityCode">----</div>
+            <div class="desc" id="personalityDesc"></div>
+            <div class="flex-btns">
+                <button class="btn btn-outline" id="restartBtn">🔄 重新测试</button>
+                <button class="btn btn-primary" id="shareResetBtn">🏠 返回介绍</button>
+            </div>
+        </div>
+    </div>
+    <footer>基于真实竞赛习惯设计 | 每个维度5题 · 倾向累积决定最终4字母</footer>
+</div>
+
+<script>
+    // ---------- 定义题目 (20题，每个维度5题) ----------
+    // 维度标识: approach (T/P), style (C/R), verify (V/S), learning (B/D)
+    const QUESTIONS = [
+        // 维度1: 解题思路 (approach) 5题
+        { text: "面对一道毫无思路的难题，你通常的第一步是？", dim: "approach", optA: { val: "T", label: "在草稿纸上进行数学推导，尝试证明性质" }, optB: { val: "P", label: "直接写个暴力/贪心框架，看看能否跑出样例" } },
+        { text: "当动态规划状态转移方程很复杂时，你更倾向？", dim: "approach", optA: { val: "T", label: "先证明最优子结构 + 无后效性，再实现" }, optB: { val: "P", label: "写出方程直接编码，通过调试修正" } },
+        { text: "拿到一道二分答案题目，你通常？", dim: "approach", optA: { val: "T", label: "严格推导单调性和check函数的正确性" }, optB: { val: "P", label: "写个check, 拿样例测，不对再调" } },
+        { text: "对于复杂度分析，你的习惯是？", dim: "approach", optA: { val: "T", label: "正式编码前精确计算最坏复杂度，确保不会TLE" }, optB: { val: "P", label: "先写出来，如果TLE了再考虑优化" } },
+        { text: "你更同意以下哪种观点？", dim: "approach", optA: { val: "T", label: "「想清楚再写，一次AC率更高」" }, optB: { val: "P", label: "「代码跑起来才有真相，边写边修正」" } },
+        
+        // 维度2: 代码风格 (style) 5题
+        { text: "关于代码长度，你的偏好是？", dim: "style", optA: { val: "C", label: "尽可能短，使用位运算、三目、STL嵌套，看起来优雅" }, optB: { val: "R", label: "清晰易读为主，每个变量有意义，加注释和边界检查" } },
+        { text: "对于数组越界或空指针风险，你通常？", dim: "style", optA: { val: "C", label: "相信自己的下标计算，不会额外添加assert" }, optB: { val: "R", label: "经常用 assert, if 判断边界，避免RE" } },
+        { text: "写一个复杂的dfs/回溯，你倾向于？", dim: "style", optA: { val: "C", label: "全局变量 + 简短函数，代码紧凑" }, optB: { val: "R", label: "参数传递明确，状态恢复整洁，模块拆分" } },
+        { text: "团队合作（如ACM）时，你的代码风格更让队友觉得？", dim: "style", optA: { val: "C", label: "精妙但需要一定理解成本" }, optB: { val: "R", label: "傻瓜式稳健，任何人接手都容易" } },
+        { text: "遇到多组输入数据，你习惯？", dim: "style", optA: { val: "C", label: "用 while (T--) 极简写法，内部尽量复用" }, optB: { val: "R", label: "初始化彻底，每个case独立重置数组" } },
+        
+        // 维度3: 验证策略 (verify) 5题
+        { text: "写完一道题的代码后，你的第一反应是？", dim: "verify", optA: { val: "V", label: "构造随机大数据 + 暴力对拍，确保正确" }, optB: { val: "S", label: "运行样例，感觉没问题就直接提交" } },
+        { text: "在OJ上获得WA后，你通常怎么做？", dim: "verify", optA: { val: "V", label: "本地生成边界数据和极端情况，用脚本对拍找出反例" }, optB: { val: "S", label: "根据错误猜测修改代码，再交一发碰运气" } },
+        { text: "距离比赛结束还有30分钟，有一道题样例过了但不太自信，你会？", dim: "verify", optA: { val: "V", label: "花20分钟写对拍和极端测试，稳一手" }, optB: { val: "S", label: "直接提交，相信样例代表大部分情况" } },
+        { text: "关于对拍工具(暴力+数据生成器)，你的态度？", dim: "verify", optA: { val: "V", label: "必备神器，疑难题目必写对拍" }, optB: { val: "S", label: "很少用，感觉浪费时间，靠OJ反馈更高效" } },
+        { text: "当你卡在一个隐蔽的bug上超过20分钟，你更倾向？", dim: "verify", optA: { val: "V", label: "缩小范围，构造最小反例并静态分析" }, optB: { val: "S", label: "提交几次看不同的WA信息，反向推理" } },
+        
+        // 维度4: 学习策略 (learning) 5题
+        { text: "假期集训，你更愿意如何安排？", dim: "learning", optA: { val: "B", label: "每天接触不同算法 (图论、DP、字符串、数据结构轮着来)" }, optB: { val: "D", label: "一周专注攻克一个专题，比如网络流或平衡树" } },
+        { text: "遇到一个新算法（如FFT），你的学习方式是？", dim: "learning", optA: { val: "B", label: "了解思想、应用场景和模板，快速刷几道模板题" }, optB: { val: "D", label: "深究数学原理，手推公式，尝试优化常数和扩展" } },
+        { text: "你更羡慕哪种选手？", dim: "learning", optA: { val: "B", label: "什么题都会一点，见多识广，靠套路库拿分" }, optB: { val: "D", label: "某几个领域极其精通，能出奇制胜" } },
+        { text: "刷题时看到一道新颖的构造题，你会？", dim: "learning", optA: { val: "B", label: "尝试后如果不会，直接看题解，积累新套路" }, optB: { val: "D", label: "死磕几个小时甚至几天，自己想出解法" } },
+        { text: "关于算法竞赛知识体系，你的目标是？", dim: "learning", optA: { val: "B", label: "覆盖大部分常见算法，能应对各种题型" }, optB: { val: "D", label: "精通少数高阶算法，追求极致的效率与深度" } }
+    ];
+
+    // 确保每个维度正好5题
+    // 校验
+    const dimCount = { approach:0, style:0, verify:0, learning:0 };
+    QUESTIONS.forEach(q => dimCount[q.dim]++);
+    // console.log(dimCount);  // 都是5
+
+    // 分值记录
+    let scores = {
+        approach: { T:0, P:0 },
+        style: { C:0, R:0 },
+        verify: { V:0, S:0 },
+        learning: { B:0, D:0 }
+    };
+
+    let currentIndex = 0;          // 0-indexed
+    let answers = new Array(20).fill(null);  // 存储每道题的选定值 { dim, selectedVal }
+    let testStarted = false;
+
+    // DOM 元素
+    const introArea = document.getElementById('introArea');
+    const quizArea = document.getElementById('quizArea');
+    const resultArea = document.getElementById('resultArea');
+    const startBtn = document.getElementById('startBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const qNumSpan = document.getElementById('qNum');
+    const progressFill = document.getElementById('progressFill');
+    const restartBtn = document.getElementById('restartBtn');
+    const shareResetBtn = document.getElementById('shareResetBtn');
+    const personalityCodeSpan = document.getElementById('personalityCode');
+    const personalityDescDiv = document.getElementById('personalityDesc');
+
+    // 重置全部状态 (回到介绍页)
+    function fullReset() {
+        // 重置分数
+        scores = {
+            approach: { T:0, P:0 },
+            style: { C:0, R:0 },
+            verify: { V:0, S:0 },
+            learning: { B:0, D:0 }
+        };
+        answers.fill(null);
+        currentIndex = 0;
+        testStarted = false;
+        introArea.classList.remove('hidden');
+        quizArea.classList.add('hidden');
+        resultArea.classList.add('hidden');
+    }
+
+    // 根据answers重新计算总分 (保证每次加载题目或跳题时分数同步)
+    function recalcScoresFromAnswers() {
+        // 重置分数
+        scores = {
+            approach: { T:0, P:0 },
+            style: { C:0, R:0 },
+            verify: { V:0, S:0 },
+            learning: { B:0, D:0 }
+        };
+        for (let i = 0; i < answers.length; i++) {
+            const ans = answers[i];
+            if (ans !== null) {
+                const dim = ans.dim;
+                const val = ans.selectedVal;
+                if (scores[dim] && scores[dim][val] !== undefined) {
+                    scores[dim][val]++;
+                }
+            }
+        }
+    }
+
+    // 渲染当前题目
+    function renderCurrentQuestion() {
+        if (!testStarted) return;
+        const q = QUESTIONS[currentIndex];
+        if (!q) return;
+        questionText.innerText = q.text;
+        const optA = q.optA;
+        const optB = q.optB;
+        // 记录当前题目是否已经选过
+        const existing = answers[currentIndex];
+        // 构建选项按钮
+        optionsContainer.innerHTML = '';
+        
+        const btnA = document.createElement('button');
+        btnA.className = 'opt-btn';
+        btnA.innerHTML = `<span class="opt-prefix">A</span> <span style="flex:1">${optA.label}</span>`;
+        btnA.addEventListener('click', () => {
+            selectAnswer(currentIndex, q.dim, optA.val);
+        });
+        const btnB = document.createElement('button');
+        btnB.className = 'opt-btn';
+        btnB.innerHTML = `<span class="opt-prefix">B</span> <span style="flex:1">${optB.label}</span>`;
+        btnB.addEventListener('click', () => {
+            selectAnswer(currentIndex, q.dim, optB.val);
+        });
+        
+        // 高亮已选 (视觉提示)
+        if (existing && existing.selectedVal === optA.val) {
+            btnA.style.background = "#2b4b9e";
+            btnA.style.borderColor = "#7aa9ff";
+        } else if (existing && existing.selectedVal === optB.val) {
+            btnB.style.background = "#2b4b9e";
+            btnB.style.borderColor = "#7aa9ff";
+        }
+        
+        optionsContainer.appendChild(btnA);
+        optionsContainer.appendChild(btnB);
+        
+        // 更新序号与进度
+        qNumSpan.innerText = `第${currentIndex+1} / ${QUESTIONS.length}题`;
+        const percent = ((currentIndex+1) / QUESTIONS.length) * 100;
+        progressFill.style.width = `${percent}%`;
+        
+        // 上一页按钮可见性
+        if (currentIndex === 0) {
+            prevBtn.style.visibility = "hidden";
+        } else {
+            prevBtn.style.visibility = "visible";
+        }
+    }
+    
+    // 选择答案
+    function selectAnswer(idx, dim, val) {
+        if (!testStarted) return;
+        // 更新answers数组
+        answers[idx] = { dim, selectedVal: val };
+        // 重新计算总分
+        recalcScoresFromAnswers();
+        
+        // 重新渲染当前题目以显示高亮
+        renderCurrentQuestion();
+        
+        // 自动跳到下一题（如果非最后一题）
+        if (idx + 1 < QUESTIONS.length) {
+            currentIndex = idx + 1;
+            renderCurrentQuestion();
+        } else {
+            // 已经是最后一题，且刚完成选择，则自动计算结果
+            finishAndShowResult();
+        }
+    }
+    
+    // 上一题逻辑
+    function goPrev() {
+        if (!testStarted) return;
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCurrentQuestion();
+        }
+    }
+    
+    // 完成所有题目后计算人格并展示结果
+    function finishAndShowResult() {
+        // 确保所有题目都已选（未选完其实也可以，但最好是20题都选了；若没选全，自动给默认倾向？但为了体验，强制检查）
+        const allSelected = answers.every(ans => ans !== null);
+        if (!allSelected) {
+            // 提示未完成，但不阻止结果？友好提醒
+            alert(`请完成全部20道题目再查看结果 (还剩 ${answers.filter(a=>a===null).length} 题)`);
+            // 跳转到第一个未答题
+            const firstNull = answers.findIndex(a => a === null);
+            if (firstNull !== -1) {
+                currentIndex = firstNull;
+                renderCurrentQuestion();
+            }
+            return;
+        }
+        
+        // 计算四个维度的最终字母
+        function getDominant(dimScores, pair) {
+            const left = pair[0];
+            const right = pair[1];
+            if (dimScores[left] > dimScores[right]) return left;
+            if (dimScores[right] > dimScores[left]) return right;
+            // 平局时: 按常规竞赛中稍微偏向理论/简洁/验证/广度 (默认顺序)
+            // approach默认T, style默认C, verify默认V, learning默认B
+            if (dimScores === scores.approach) return 'T';
+            if (dimScores === scores.style) return 'C';
+            if (dimScores === scores.verify) return 'V';
+            if (dimScores === scores.learning) return 'B';
+            return left;
+        }
+        
+        const approachLetter = getDominant(scores.approach, ['T','P']);
+        const styleLetter = getDominant(scores.style, ['C','R']);
+        const verifyLetter = getDominant(scores.verify, ['V','S']);
+        const learningLetter = getDominant(scores.learning, ['B','D']);
+        
+        const personality = `${approachLetter}${styleLetter}${verifyLetter}${learningLetter}`;
+        
+        // 生成详细描述
+        const approachDesc = approachLetter === 'T' ? "理论派：严谨推导，先证后写" : "实践派：敏捷编码，边写边试";
+        const styleDesc = styleLetter === 'C' ? "简洁派：代码精悍，善用技巧" : "稳健派：安全第一，边界完备";
+        const verifyDesc = verifyLetter === 'V' ? "验证派：对拍狂魔，自测为王" : "提交派：信任OJ，快速迭代";
+        const learningDesc = learningLetter === 'B' ? "广度派：见多识广，套路丰富" : "深度派：专精领域，极致优化";
+        
+        let strengths = "";
+        let advice = "";
+        // 根据组合生成额外风格提示
+        if (personality === "TCVB") strengths = "⚡ 全能战神，数学与代码双优，几乎一次AC。";
+        else if (personality === "PRSD") strengths = "🔥 实战狂人，敢交敢冲，在比赛中积累经验值飞快。";
+        else if (personality === "TRVD") strengths = "📖 学术大牛，深度和严谨让你适合攻坚难题。";
+        else if (personality === "PCSB") strengths = "💨 快枪手，短平快风格，适合多题赛制。";
+        else strengths = "你的独特竞赛风格，结合了以上维度特质，形成专属优势。";
+        
+        advice = `建议：${verifyLetter === 'V' ? '保持严谨，但也要注意时间效率' : '尝试在对拍上花些时间，可能降低罚时'}；${learningLetter === 'B' ? '适当深度钻研一两个领域能提高上限' : '偶尔拓宽视野，也许发现新大陆'}。`;
+        
+        const fullDesc = `【${approachDesc}】·【${styleDesc}】·【${verifyDesc}】·【${learningDesc}】<br><br>✨ ${strengths}<br>📌 ${advice}<br><br>🏆 典型习惯：${approachLetter === 'T' ? '喜欢前置推导' : '边写边找感觉'}，代码${styleLetter === 'C' ? '短小精悍' : '结构稳健'}，${verifyLetter === 'V' ? '提交前充分验证' : '依赖OJ反馈修正'}，${learningLetter === 'B' ? '广泛刷题积累' : '深耕少数算法领域'}。`;
+        
+        personalityCodeSpan.innerText = personality;
+        personalityDescDiv.innerHTML = fullDesc;
+        
+        // 显示结果区域，隐藏其他
+        introArea.classList.add('hidden');
+        quizArea.classList.add('hidden');
+        resultArea.classList.remove('hidden');
+        testStarted = false;  // 测试结束
+    }
+    
+    // 开始测试: 重置所有状态并进入答题第一题
+    function startTest() {
+        // 重置
+        scores = {
+            approach: { T:0, P:0 },
+            style: { C:0, R:0 },
+            verify: { V:0, S:0 },
+            learning: { B:0, D:0 }
+        };
+        answers.fill(null);
+        currentIndex = 0;
+        testStarted = true;
+        
+        introArea.classList.add('hidden');
+        resultArea.classList.add('hidden');
+        quizArea.classList.remove('hidden');
+        
+        recalcScoresFromAnswers(); // 确保分数初始0
+        renderCurrentQuestion();
+    }
+    
+    // 返回介绍（不清除潜在进度，但完全重置）
+    function backToIntro() {
+        fullReset();
+    }
+    
+    // 事件绑定
+    startBtn.addEventListener('click', startTest);
+    prevBtn.addEventListener('click', goPrev);
+    if (restartBtn) restartBtn.addEventListener('click', () => { fullReset(); startTest(); });
+    if (shareResetBtn) shareResetBtn.addEventListener('click', fullReset);
+    
+    // 可选: 未选完时手动调用完成函数，但结果按钮通过最后一题自动触发，也可加一个“提交”按钮，但自动跳转更流畅。
+    // 为了防止上一题后更改答案影响总分, recalc每次都重新计算，完美。
+    // 初始化重置状态显示介绍
+    fullReset();
+</script>
+</body>
+</html>
